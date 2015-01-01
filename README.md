@@ -3,9 +3,7 @@ client, [irssi](http://www.irssi.org/)
 
 ## boxcarirssi.pl
 
-Forked from [sniker's boxcarirssi.pl](https://git.eth0.info/sniker/boxcarirssi/blob/ab959500632d1272161801282ae9b38c6f8f2ebf/boxcarirssi.pl)
-
-This script sends notifications to your phone (via [Boxcar](https://boxcar.io/)) using [boxcar-growl.py](https://gist.github.com/foolishbrilliance/1b3d394ceb8b776f06d7). By default, this script will only send notifications when you are away. You can enable non-away notifications by running `/set boxcarirssi_nonaway ON`.
+Forked from [sniker's boxcarirssi.pl](https://git.eth0.info/sniker/boxcarirssi/blob/ab959500632d1272161801282ae9b38c6f8f2ebf/boxcarirssi.pl). Sends notifications to your phone (via [Boxcar](https://boxcar.io/)) using [boxcar-growl.py](https://gist.github.com/foolishbrilliance/1b3d394ceb8b776f06d7). By default, this script will only send notifications when you are away. You can enable non-away notifications by running `/set boxcarirssi_nonaway ON`.
 
 ## monitorwin.pl
 
