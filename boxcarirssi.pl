@@ -2,19 +2,18 @@ use strict;
 use warnings;
 
 #####################################################################
+# Latest version: https://github.com/foolishbrilliance/irssi-scripts/blob/master/boxcarirssi.pl
 # Modified from https://git.eth0.info/sniker/boxcarirssi/blob/ab959500632d1272161801282ae9b38c6f8f2ebf/boxcarirssi.pl
-# This script sends notifications to your
-# iPhone using your boxcar email and password when you are away.
 #
-# Originally I made this script for Prowl, but since people tend to
-# be cheap and rather use boxcar(which is not as good) I ported it
-# to boxcar. Boxcar lacks features such as priority.
+# This script sends notifications to your iPhone using boxcar-growl.py:
+# https://gist.github.com/foolishbrilliance/1b3d394ceb8b776f06d7
+#
+# By default, this script will only send notifications when you are away
 #
 # Commands:
-# /set boxcar_email something@example.com
-# /set boxcar_password password
-# /set boxcar_general_hilight on/off
-# /set boxcar_ignore_nettag NETWORKS # Networks in this case is a
+# /set boxcarirssi_general_hilight on/off
+# /set boxcarirssi_nonaway on/off     # enable when not away
+# /set boxcar_ignore_nettag NETWORKS  # Networks in this case is a
 #                                      comma separated list of
 #                                      network tags that should
 #                                      be ignored.
@@ -29,10 +28,6 @@ use warnings;
 # 
 # Or if you're using Debian GNU/Linux:
 # apt-get update;apt-get install libwww-perl libcrypt-ssleay-perl
-#
-#
-# eth0 will prevail. || irc.eth0.info
-#
 #####################################################################
 
 
@@ -55,8 +50,7 @@ $VERSION = "0.2";
 );
 
 # Configuration settings and default values.
-Irssi::settings_add_str("boxcarirssi", "boxcarirssi_email", "");
-Irssi::settings_add_str("boxcarirssi", "boxcarirssi_password", "");
+Irssi::settings_add_bool("boxcarirssi", "boxcarirssi_nonaway", 0);
 Irssi::settings_add_bool("boxcarirssi", "boxcarirssi_general_hilight", 0);
 Irssi::settings_add_str("boxcarirssi", "boxcarirssi_ignore_nettag", "");
 
@@ -70,7 +64,7 @@ sub send_noti {
 sub pubmsg {
     my ($server, $data, $nick, $nick_addr, $target) = @_;
     if(!Irssi::settings_get_bool("boxcarirssi_general_hilight")){
-        if($server->{usermode_away} == 1 && $data =~ /$server->{nick}/i && index(Irssi::settings_get_str("boxcarirssi_ignore_nettag"), $server->{tag}) == -1){
+        if( (Irssi::settings_get_bool("boxcarirssi_nonaway") || $server->{usermode_away} == 1) && $data =~ /$server->{nick}/i && index(Irssi::settings_get_str("boxcarirssi_ignore_nettag"), $server->{tag}) == -1){
             send_noti("$nick in $target (" . scalar(split(/\s+/, $data)) . ")" , "Current nick: " . $server->{nick} ." (Away: ". $server->{away_reason} .")" );
         }
     }
@@ -78,7 +72,7 @@ sub pubmsg {
 
 sub privmsg {
     my ($server, $data, $nick) = @_;
-    if($server->{usermode_away} == 1 && index(Irssi::settings_get_str("boxcarirssi_ignore_nettag"), $server->{tag}) == -1){
+    if( (Irssi::settings_get_bool("boxcarirssi_nonaway") || $server->{usermode_away} == 1) && index(Irssi::settings_get_str("boxcarirssi_ignore_nettag"), $server->{tag}) == -1){
         send_noti("PM from $nick (" . scalar(split(/\s+/, $data)) . " words)", "Current nick: " . $server->{nick} ." (Away: ". $server->{away_reason} .")" );
     }
 }
@@ -88,7 +82,7 @@ sub genhilight {
     my $server = $dest->{server};
 
     if($dest->{level} & MSGLEVEL_HILIGHT) {
-        if($server->{usermode_away} == 1 && index(Irssi::settings_get_str("boxcarirssi_ignore_nettag"), $server->{tag}) == -1){
+        if( (Irssi::settings_get_bool("boxcarirssi_nonaway") || $server->{usermode_away} == 1) && index(Irssi::settings_get_str("boxcarirssi_ignore_nettag"), $server->{tag}) == -1){
             if(Irssi::settings_get_bool("boxcarirssi_general_hilight")){
                 send_noti("Genhighlight - $stripped", "General Hilight " . $server->{tag} . "/" . $dest->{target} ." - ");
             }
